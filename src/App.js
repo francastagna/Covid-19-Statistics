@@ -1,26 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import CountryList from './components/ContryList/CountryList';
+import SearchBox from './components/SearchBox/SearchBox'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component{
+
+  state = {
+    countries:[],
+    searchField: ''
+  }
+
+  async componentDidMount(){
+    const resp = await fetch('https://corona-api.com/countries');
+    let countries = await resp.json();
+    countries = countries.data
+    this.setState({countries});
+  }
+
+  handleChange = (e) => (
+    this.setState({searchField: e.target.value})
+  )  
+
+  render(){
+
+    const {countries, searchField} = this.state
+    const filteredCountries = countries.filter(country => (
+      country.name.toLowerCase().includes(searchField.toLowerCase())
+    ) )
+
+    return (
+      <div className="App">
+          <h1>Covid19 Stats Web App</h1>
+          <SearchBox placeholder="Enter country name ..." handleChange={this.handleChange} />
+          <CountryList countries = {filteredCountries} />
+      </div>
+    )
+  }
 }
 
 export default App;
